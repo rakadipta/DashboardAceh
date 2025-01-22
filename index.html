@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard WebGIS</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Link ke file CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+</body>
+</html>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">Development Indicators in Aceh Province</div>
+    <div class="menu-toggle" onclick="toggleMenu()">&#9776;</div>
+    <ul class="menu">
+        <li><a href="https:/daunbonteng.github.io/dashboard/">Home</a></li>
+        <li><a href="https://rakadipta.github.io/Acehindicator/">See Fullscreen Map</a></li>
+        <li><a href="https://instagram.com/rakadipta">Contact</a></li>
+    </ul>
+    </nav>
+<!-- Main Content -->
+<div class="container mx-auto mt-6">
+        <!-- Peta -->
+        <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold mb-4">Interactive Map</h2>
+            <iframe src="https://rakadipta.github.io/Acehindicator/" class="w-full h-96 border rounded" allowfullscreen></iframe>
+        </div>
+  <!-- Diagram -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Dataset Bar Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+      }
+      .chart-container {
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto;
+      }
+      select {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+      }
+  </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Dataset Trend Bar Chart (Horizontal)</h1>
+    <div class="chart-container">
+        <!-- Dropdown Menu -->
+        <select id="dataTypeSelector">
+            <option value="GRDP">GRDP Percapita</option>
+            <option value="Poverty">Poverty</option>
+            <option value="HDI">HDI</option>
+        </select>
+        <!-- Canvas for Chart -->
+        <canvas id="trendChart"></canvas>
+    </div>
+</div>
+<script>
+    // Labels untuk sumbu X (City/Regency)
+    const labels = ["Aceh Selatan","Aceh Tenggara", "Aceh Timur", "Aceh Tengah", "Aceh Barat", "Aceh Besar", "Pidie", "Aceh Utara", "Simeulue", "Aceh Singkil", "Bireuen", "Aceh Barat Daya", "Gayo Lues", "Aceh Jaya", "Nagan Raya", "Aceh Tamiang", "Bener Meriah", "Pidie Jaya", "Kota Banda Aceh", "Kota Sabang", "Kota Lhokseumawe", "Kota Langsa", "Kota Subulussalam"
+    ];
+
+    // Data GRDP kabupaten/kota
+    const data = {
+            "GRDP": {
+                "2022": [18912000, 15768000, 20226000, 28304000, 38216000, 25597000, 18696000, 28686000, 18061000, 14096000, 24192000, 20604000, 19924000, 21952000, 42115000, 20777000, 23338000, 16826000, 62822000, 27962000, 38834000, 21677000, 15830000],
+                "2023": [19498000, 15996000, 20385000, 29496000, 39363000, 26313000, 19237000, 28502000, 18602000, 14329000, 24921000, 21108000, 20339000, 22492000, 44751000, 20975000, 24142000, 17310000, 65198000, 28389000, 39832000, 22220000, 16097000]
+            },
+            "Poverty": {
+                "2022": [12.43, 12.83, 13.91, 14.5, 17.93, 13.38, 18.79, 16.86, 18.37, 19.18, 12.51, 15.44, 18.87, 12.51, 17.38, 12.61, 18.39, 18.45, 7.13, 14.66, 10.84, 10.62, 16.94],
+                "2023": [12.1, 12.45, 13.39, 14.38, 17.86, 13.38, 18.78, 16.64, 17.92, 19.15, 12.12, 15.43, 18.82, 12.42, 17.25, 12.51, 18.31, 18.4, 7.04, 14.59, 10.73, 10.53, 16.41]
+            },
+            "HDI": {
+                "2022": [67.87, 70.32, 68.72, 73.95, 72.34, 74, 71.2, 70.22, 67.27, 69.62, 73.16, 67.41, 68.25, 70.36, 70.1, 70.43, 73.9, 74.34, 86.28, 76.85, 78.04, 77.82, 66.2],
+                "2023": [68.44, 71.05, 69.3, 74.6, 72.88, 74.53, 71.66, 70.87, 68.06, 70.14, 73.63, 68.07, 68.93, 70.88, 70.78, 71.35, 74.49, 74.8, 86.69, 77.52, 78.92, 78.36, 67.1]
+            }
+        };
+    
+       // Initial Chart.js Configuration
+       const ctx = document.getElementById('trendChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "2022",
+                        data: data["GRDP"]["2022"], // Default data (GRDP for 2022)
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: "2023",
+                        data: data["GRDP"]["2023"], // Default data (GRDP for 2023)
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y', // Membalik sumbu X dan Y
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                    },
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            }
+        });
+
+        // Update Chart on Dropdown Change
+        document.getElementById('dataTypeSelector').addEventListener('change', function(event) {
+            const selectedDataType = event.target.value; // Get selected data type (GRDP, Poverty, or HDI)
+            
+            // Update datasets for 2022 and 2023
+            chart.data.datasets[0].data = data[selectedDataType]["2022"];
+            chart.data.datasets[1].data = data[selectedDataType]["2023"];
+            
+            // Update chart title dynamically
+            chart.options.plugins.title = {
+                display: true,
+                text: `Trends for ${selectedDataType} (2022 vs 2023)`
+            };
+
+            chart.update(); // Re-render the chart
+        });
+
+</script>
+</div>
